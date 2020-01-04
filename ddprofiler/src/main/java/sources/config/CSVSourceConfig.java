@@ -6,66 +6,66 @@ import sources.SourceType;
 
 public class CSVSourceConfig implements SourceConfig {
 
-    private String sourceName;
+	private String sourceName;
 
-    private String relationName;
+	private String relationName;
 
-    @JsonProperty
-    private String path;
+	@JsonProperty
+	private String path;
 
-    @JsonProperty
-    private String separator;
+	@JsonProperty
+	private String separator;
 
-    @Override
-    public String getPath() {
-	return path;
-    }
+	@Override
+	public String getPath() {
+		return path;
+	}
 
-    public String getSeparator() {
-	return separator;
-    }
+	public String getSeparator() {
+		return separator;
+	}
 
-    @Deprecated
-    public void setPath(String path) {
-	this.path = path;
-    }
+	@Deprecated
+	public void setPath(String path) {
+		this.path = path;
+	}
 
-    public void setSeparator(String separator) {
-	this.separator = separator;
-    }
+	public void setSeparator(String separator) {
+		this.separator = separator;
+	}
 
-    @Override
-    public String getSourceName() {
-	return sourceName;
-    }
+	@Override
+	public String getSourceName() {
+		return sourceName;
+	}
 
-    @Override
-    public void setSourceName(String sourceName) {
-	this.sourceName = sourceName;
-    }
+	@Override
+	public void setSourceName(String sourceName) {
+		this.sourceName = sourceName;
+	}
 
-    @Override
-    public SourceType getSourceType() {
-	return SourceType.csv;
-    }
+	@Override
+	public SourceType getSourceType() {
+		return SourceType.csv;
+	}
 
-    public String getRelationName() {
-	return relationName;
-    }
+	public String getRelationName() {
+		return relationName;
+	}
 
-    @Deprecated
-    public void setRelationName(String relationName) {
-	this.relationName = relationName;
-    }
+	@Deprecated
+	public void setRelationName(String relationName) {
+		this.relationName = relationName;
+	}
 
-    @Override
-    public SourceConfig selfCopy() {
-	CSVSourceConfig copy = new CSVSourceConfig();
-	copy.sourceName = this.sourceName;
-	copy.relationName = this.relationName;
-	copy.path = this.path;
-	copy.separator = this.separator;
-	return copy;
-    }
+	@Override
+	public SourceConfig selfCopy() {
+		CSVSourceConfig copy = new CSVSourceConfig();
+		copy.sourceName = this.sourceName;
+		copy.relationName = this.relationName;
+		copy.path = this.path;
+		copy.separator = this.separator;
+		return copy;
+	}
 
 }

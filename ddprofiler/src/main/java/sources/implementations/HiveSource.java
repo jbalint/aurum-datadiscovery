@@ -31,207 +31,219 @@ import sources.deprecated.TableInfo;
 
 public class HiveSource implements Source {
 
-    final private Logger LOG = LoggerFactory.getLogger(HiveSource.class.getName());
+	final private Logger LOG = LoggerFactory.getLogger(HiveSource.class.getName());
 
-    private Connection connection;
+	private Connection connection;
 
-    private String relationName;
-    private int tid;
-    private HiveSourceConfig config;
+	private String relationName;
 
-    private TableInfo tableInfo;
-    private boolean firstTime = true;
-    private Statement theStatement;
-    private ResultSet theRS;
+	private int tid;
 
-    // Metrics
-    private Counter error_records = Metrics.REG.counter((name(PostgresSource.class, "error", "records")));
-    private Counter success_records = Metrics.REG.counter((name(PostgresSource.class, "success", "records")));
+	private HiveSourceConfig config;
 
-    public HiveSource() {
+	private TableInfo tableInfo;
 
-    }
+	private boolean firstTime = true;
 
-    public HiveSource(String relationName) {
-	this.relationName = relationName;
-	this.tid = SourceUtils.computeTaskId(config.getDatabase_name(), relationName);
-    }
+	private Statement theStatement;
 
-    @Override
-    public List<Source> processSource(SourceConfig config) {
-	assert (config instanceof HiveSourceConfig);
+	private ResultSet theRS;
 
-	HiveSourceConfig hiveConfig = (HiveSourceConfig) config;
-	this.config = hiveConfig;
+	// Metrics
+	private Counter error_records = Metrics.REG.counter((name(PostgresSource.class, "error", "records")));
 
-	List<Source> tasks = new ArrayList<>();
+	private Counter success_records = Metrics.REG.counter((name(PostgresSource.class, "success", "records")));
 
-	// TODO: at this point we'll be harnessing metadata from the source
+	public HiveSource() {
 
-	String ip = hiveConfig.getHive_server_ip();
-	String port = new Integer(hiveConfig.getHive_server_port()).toString();
-	String dbName = hiveConfig.getDatabase_name();
-
-	LOG.info("Conn to Hive on: {}:{}", ip, port);
-
-	// FIXME: remove this enum; simplify this
-	Connection hiveConn = SourceUtils.getDBConnection(SourceType.hive, ip, port, dbName, null, null);
-
-	List<String> tables = SourceUtils.getTablesFromDatabase(hiveConn, null);
-	try {
-	    hiveConn.close();
-	} catch (SQLException e) {
-	    e.printStackTrace();
-	}
-	for (String relationName : tables) {
-	    LOG.info("Detected relational table: {}", relationName);
-
-	    HiveSource hs = new HiveSource(relationName);
-
-	    tasks.add(hs);
-	}
-	return tasks;
-    }
-
-    @Override
-    public SourceType getSourceType() {
-	return SourceType.hive;
-    }
-
-    @Override
-    public String getPath() {
-	return config.getPath();
-    }
-
-    @Override
-    public String getRelationName() {
-	return this.relationName;
-    }
-
-    @Override
-    public List<Attribute> getAttributes() throws IOException, SQLException {
-	if (tableInfo.getTableAttributes() != null)
-	    return tableInfo.getTableAttributes();
-	DatabaseMetaData metadata = connection.getMetaData();
-	ResultSet resultSet = metadata.getColumns(null, null, config.getRelationName(), null);
-	Vector<Attribute> attrs = new Vector<Attribute>();
-	while (resultSet.next()) {
-	    String name = resultSet.getString("COLUMN_NAME");
-	    String type = resultSet.getString("TYPE_NAME");
-	    int size = resultSet.getInt("COLUMN_SIZE");
-	    Attribute attr = new Attribute(name, type, size);
-	    attrs.addElement(attr);
-	}
-	resultSet.close();
-	tableInfo.setTableAttributes(attrs);
-	return attrs;
-    }
-
-    @Override
-    public SourceConfig getSourceConfig() {
-	return this.config;
-    }
-
-    @Override
-    public int getTaskId() {
-	return this.tid;
-    }
-
-    @Override
-    public Map<Attribute, List<String>> readRows(int num) throws IOException, SQLException {
-	if (firstTime) {
-	    handleFirstTime(num);
-	    firstTime = false;
-	}
-	Map<Attribute, List<String>> data = new LinkedHashMap<>();
-	// Make sure attrs is populated, if not, populate it here
-	if (data.isEmpty()) {
-	    List<Attribute> attrs = this.getAttributes();
-	    attrs.forEach(a -> data.put(a, new ArrayList<>()));
 	}
 
-	// Read data and insert in order
-	List<Record> recs = new ArrayList<>();
-	boolean readData = this.read(num, recs);
-	if (!readData) {
-	    return null;
+	public HiveSource(String relationName) {
+		this.relationName = relationName;
+		this.tid = SourceUtils.computeTaskId(config.getDatabase_name(), relationName);
 	}
 
-	for (Record r : recs) {
-	    List<String> values = r.getTuples();
-	    int currentIdx = 0;
-	    if (values.size() != data.values().size()) {
-		error_records.inc();
-		continue; // Some error while parsing data, a row has a
-			  // different format
-	    }
-	    success_records.inc();
-	    for (List<String> vals : data.values()) { // ordered iteration
-		vals.add(values.get(currentIdx));
-		currentIdx++;
-	    }
-	}
-	return data;
-    }
+	@Override
+	public List<Source> processSource(SourceConfig config) {
+		assert (config instanceof HiveSourceConfig);
 
-    private boolean read(int num, List<Record> rec_list) throws SQLException {
-	if (firstTime) {
-	    handleFirstTime(num);
-	    firstTime = false;
-	}
+		HiveSourceConfig hiveConfig = (HiveSourceConfig) config;
+		this.config = hiveConfig;
 
-	boolean new_row = false;
+		List<Source> tasks = new ArrayList<>();
 
-	while (num > 0 && theRS.next()) { // while there are some available and
-					  // we need to read more records
-	    new_row = true;
+		// TODO: at this point we'll be harnessing metadata from the source
 
-	    num--;
-	    // FIXME: profile and optimize this
-	    Record rec = new Record();
-	    for (int i = 0; i < this.tableInfo.getTableAttributes().size(); i++) {
-		Object obj = theRS.getObject(i + 1);
-		if (obj != null) {
-		    String v1 = obj.toString();
-		    rec.getTuples().add(v1);
-		} else {
-		    rec.getTuples().add("");
+		String ip = hiveConfig.getHive_server_ip();
+		String port = new Integer(hiveConfig.getHive_server_port()).toString();
+		String dbName = hiveConfig.getDatabase_name();
+
+		LOG.info("Conn to Hive on: {}:{}", ip, port);
+
+		// FIXME: remove this enum; simplify this
+		Connection hiveConn = SourceUtils.getDBConnection(SourceType.hive, ip, port, dbName, null, null);
+
+		List<String> tables = SourceUtils.getTablesFromDatabase(hiveConn, null);
+		try {
+			hiveConn.close();
 		}
-	    }
-	    rec_list.add(rec);
+		catch (SQLException e) {
+			e.printStackTrace();
+		}
+		for (String relationName : tables) {
+			LOG.info("Detected relational table: {}", relationName);
+
+			HiveSource hs = new HiveSource(relationName);
+
+			tasks.add(hs);
+		}
+		return tasks;
 	}
 
-	return new_row;
-    }
-
-    private boolean handleFirstTime(int fetchSize) {
-	String sql = "SELECT * FROM " + config.getRelationName();
-
-	try {
-	    connection.setAutoCommit(false);
-	    theStatement = connection.createStatement();
-	    theStatement.setFetchSize(fetchSize);
-	    theRS = theStatement.executeQuery(sql);
-	} catch (SQLException sqle) {
-	    System.out.println("ERROR: " + sqle.getLocalizedMessage());
-	    return false;
-	} catch (Exception e) {
-	    System.out.println("ERROR: executeQuery failed");
-	    return false;
+	@Override
+	public SourceType getSourceType() {
+		return SourceType.hive;
 	}
-	return true;
-    }
 
-    @Override
-    public void close() {
-	try {
-	    // this.connection.close();
-	    this.theRS.close();
-	    this.theStatement.close();
-	} catch (SQLException e) {
-	    // TODO Auto-generated catch block
-	    e.printStackTrace();
+	@Override
+	public String getPath() {
+		return config.getPath();
 	}
-    }
+
+	@Override
+	public String getRelationName() {
+		return this.relationName;
+	}
+
+	@Override
+	public List<Attribute> getAttributes() throws IOException, SQLException {
+		if (tableInfo.getTableAttributes() != null) {
+			return tableInfo.getTableAttributes();
+		}
+		DatabaseMetaData metadata = connection.getMetaData();
+		ResultSet resultSet = metadata.getColumns(null, null, config.getRelationName(), null);
+		Vector<Attribute> attrs = new Vector<Attribute>();
+		while (resultSet.next()) {
+			String name = resultSet.getString("COLUMN_NAME");
+			String type = resultSet.getString("TYPE_NAME");
+			int size = resultSet.getInt("COLUMN_SIZE");
+			Attribute attr = new Attribute(name, type, size);
+			attrs.addElement(attr);
+		}
+		resultSet.close();
+		tableInfo.setTableAttributes(attrs);
+		return attrs;
+	}
+
+	@Override
+	public SourceConfig getSourceConfig() {
+		return this.config;
+	}
+
+	@Override
+	public int getTaskId() {
+		return this.tid;
+	}
+
+	@Override
+	public Map<Attribute, List<String>> readRows(int num) throws IOException, SQLException {
+		if (firstTime) {
+			handleFirstTime(num);
+			firstTime = false;
+		}
+		Map<Attribute, List<String>> data = new LinkedHashMap<>();
+		// Make sure attrs is populated, if not, populate it here
+		if (data.isEmpty()) {
+			List<Attribute> attrs = this.getAttributes();
+			attrs.forEach(a -> data.put(a, new ArrayList<>()));
+		}
+
+		// Read data and insert in order
+		List<Record> recs = new ArrayList<>();
+		boolean readData = this.read(num, recs);
+		if (!readData) {
+			return null;
+		}
+
+		for (Record r : recs) {
+			List<String> values = r.getTuples();
+			int currentIdx = 0;
+			if (values.size() != data.values().size()) {
+				error_records.inc();
+				continue; // Some error while parsing data, a row has a
+				// different format
+			}
+			success_records.inc();
+			for (List<String> vals : data.values()) { // ordered iteration
+				vals.add(values.get(currentIdx));
+				currentIdx++;
+			}
+		}
+		return data;
+	}
+
+	private boolean read(int num, List<Record> rec_list) throws SQLException {
+		if (firstTime) {
+			handleFirstTime(num);
+			firstTime = false;
+		}
+
+		boolean new_row = false;
+
+		while (num > 0 && theRS.next()) { // while there are some available and
+			// we need to read more records
+			new_row = true;
+
+			num--;
+			// FIXME: profile and optimize this
+			Record rec = new Record();
+			for (int i = 0; i < this.tableInfo.getTableAttributes().size(); i++) {
+				Object obj = theRS.getObject(i + 1);
+				if (obj != null) {
+					String v1 = obj.toString();
+					rec.getTuples().add(v1);
+				}
+				else {
+					rec.getTuples().add("");
+				}
+			}
+			rec_list.add(rec);
+		}
+
+		return new_row;
+	}
+
+	private boolean handleFirstTime(int fetchSize) {
+		String sql = "SELECT * FROM " + config.getRelationName();
+
+		try {
+			connection.setAutoCommit(false);
+			theStatement = connection.createStatement();
+			theStatement.setFetchSize(fetchSize);
+			theRS = theStatement.executeQuery(sql);
+		}
+		catch (SQLException sqle) {
+			System.out.println("ERROR: " + sqle.getLocalizedMessage());
+			return false;
+		}
+		catch (Exception e) {
+			System.out.println("ERROR: executeQuery failed");
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public void close() {
+		try {
+			// this.connection.close();
+			this.theRS.close();
+			this.theStatement.close();
+		}
+		catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
 }

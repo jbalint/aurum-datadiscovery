@@ -1,7 +1,7 @@
 /**
  * @author Raul - raulcf@csail.mit.edu
- *
  */
+
 package analysis;
 
 import java.util.ArrayList;
@@ -16,69 +16,72 @@ import sources.deprecated.Attribute.AttributeType;
 
 public class NumericalAnalyzer implements NumericalAnalysis {
 
-  private List<DataConsumer> analyzers;
-  private CardinalityAnalyzer ca;
-  private RangeAnalyzer ra;
+	private List<DataConsumer> analyzers;
 
-  private NumericalAnalyzer() {
-    analyzers = new ArrayList<>();
-    ca = new CardinalityAnalyzer();
-    ra = new RangeAnalyzer();
-    analyzers.add(ca);
-    analyzers.add(ra);
-  }
+	private CardinalityAnalyzer ca;
 
-  public static NumericalAnalyzer makeAnalyzer() {
-    return new NumericalAnalyzer();
-  }
+	private RangeAnalyzer ra;
 
-  @Override
-  public boolean feedIntegerData(List<Long> records) {
+	private NumericalAnalyzer() {
+		analyzers = new ArrayList<>();
+		ca = new CardinalityAnalyzer();
+		ra = new RangeAnalyzer();
+		analyzers.add(ca);
+		analyzers.add(ra);
+	}
 
-    Iterator<DataConsumer> dcs = analyzers.iterator();
-    while (dcs.hasNext()) {
-      IntegerDataConsumer dc = (IntegerDataConsumer)dcs.next();
-      dc.feedIntegerData(records);
-    }
+	public static NumericalAnalyzer makeAnalyzer() {
+		return new NumericalAnalyzer();
+	}
 
-    return false;
-  }
+	@Override
+	public boolean feedIntegerData(List<Long> records) {
 
-  @Override
-  public boolean feedFloatData(List<Float> records) {
+		Iterator<DataConsumer> dcs = analyzers.iterator();
+		while (dcs.hasNext()) {
+			IntegerDataConsumer dc = (IntegerDataConsumer) dcs.next();
+			dc.feedIntegerData(records);
+		}
 
-    Iterator<DataConsumer> dcs = analyzers.iterator();
-    while (dcs.hasNext()) {
-      FloatDataConsumer dc = (FloatDataConsumer)dcs.next();
-      dc.feedFloatData(records);
-    }
+		return false;
+	}
 
-    return false;
-  }
+	@Override
+	public boolean feedFloatData(List<Float> records) {
 
-  @Override
-  public DataProfile getProfile() {
-    // TODO Auto-generated method stub
-    return null;
-  }
+		Iterator<DataConsumer> dcs = analyzers.iterator();
+		while (dcs.hasNext()) {
+			FloatDataConsumer dc = (FloatDataConsumer) dcs.next();
+			dc.feedFloatData(records);
+		}
 
-  @Override
-  public Cardinality getCardinality() {
-    return ca.getCardinality();
-  }
+		return false;
+	}
 
-  @Override
-  public Range getNumericalRange(AttributeType type) {
-    if (type.equals(AttributeType.FLOAT)) {
-      return ra.getFloatRange();
-    } else if (type.equals(AttributeType.INT)) {
-      return ra.getIntegerRange();
-    }
-    return null;
-  }
+	@Override
+	public DataProfile getProfile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-  @Override
-  public long getQuantile(double p) {
-    return ra.getQuantile(p);
-  }
+	@Override
+	public Cardinality getCardinality() {
+		return ca.getCardinality();
+	}
+
+	@Override
+	public Range getNumericalRange(AttributeType type) {
+		if (type.equals(AttributeType.FLOAT)) {
+			return ra.getFloatRange();
+		}
+		else if (type.equals(AttributeType.INT)) {
+			return ra.getIntegerRange();
+		}
+		return null;
+	}
+
+	@Override
+	public long getQuantile(double p) {
+		return ra.getQuantile(p);
+	}
 }

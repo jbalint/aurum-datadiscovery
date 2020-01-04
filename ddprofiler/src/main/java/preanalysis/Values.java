@@ -6,53 +6,69 @@ import sources.deprecated.Attribute.AttributeType;
 
 public class Values {
 
-  final private AttributeType type;
+	final private AttributeType type;
 
-  private List<Float> floats;
-  private List<String> strings;
-  private List<Long> integers;
+	private List<Float> floats;
 
-  private Values(AttributeType type) { this.type = type; }
+	private List<String> strings;
 
-  private void setFloats(List<Float> values) { this.floats = values; }
+	private List<Long> integers;
 
-  private void setStrings(List<String> values) { this.strings = values; }
+	private Values(AttributeType type) {
+		this.type = type;
+	}
 
-  private void setIntegers(List<Long> values) { this.integers = values; }
+	private void setFloats(List<Float> values) {
+		this.floats = values;
+	}
 
-  public static Values makeFloatValues(List<Float> castValues) {
-    Values vs = new Values(AttributeType.FLOAT);
-    vs.setFloats(castValues);
-    return vs;
-  }
+	private void setStrings(List<String> values) {
+		this.strings = values;
+	}
 
-  public static Values makeStringValues(List<String> castValues) {
-    Values vs = new Values(AttributeType.STRING);
-    vs.setStrings(castValues);
-    return vs;
-  }
+	private void setIntegers(List<Long> values) {
+		this.integers = values;
+	}
 
-  public static Values makeIntegerValues(List<Long> castValues) {
-    Values vs = new Values(AttributeType.INT);
-    vs.setIntegers(castValues);
-    return vs;
-  }
+	public static Values makeFloatValues(List<Float> castValues) {
+		Values vs = new Values(AttributeType.FLOAT);
+		vs.setFloats(castValues);
+		return vs;
+	}
 
-  public boolean areFloatValues() {
-    return this.type.equals(AttributeType.FLOAT);
-  }
+	public static Values makeStringValues(List<String> castValues) {
+		Values vs = new Values(AttributeType.STRING);
+		vs.setStrings(castValues);
+		return vs;
+	}
 
-  public boolean areIntegerValues() {
-    return this.type.equals(AttributeType.INT);
-  }
+	public static Values makeIntegerValues(List<Long> castValues) {
+		Values vs = new Values(AttributeType.INT);
+		vs.setIntegers(castValues);
+		return vs;
+	}
 
-  public boolean areStringValues() {
-    return this.type.equals(AttributeType.STRING);
-  }
+	public boolean areFloatValues() {
+		return this.type.equals(AttributeType.FLOAT);
+	}
 
-  public List<Float> getFloats() { return floats; }
+	public boolean areIntegerValues() {
+		return this.type.equals(AttributeType.INT);
+	}
 
-  public List<String> getStrings() { return strings; }
+	public boolean areStringValues() {
+		return this.type.equals(AttributeType.STRING);
+	}
 
-  public List<Long> getIntegers() { return integers; }
+	public List<Float> getFloats() {
+		return floats;
+	}
+
+	public List<String> getStrings() {
+		return strings;
+	}
+
+	public List<Long> getIntegers() {
+		return integers;
+	}
 }

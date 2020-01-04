@@ -7,25 +7,25 @@ import sources.SourceType;
 
 public class GenericSource {
 
-    @JsonProperty
-    private String name;
+	@JsonProperty
+	private String name;
 
-    @JsonProperty
-    private SourceType type;
+	@JsonProperty
+	private SourceType type;
 
-    @JsonProperty
-    private JsonNode config;
+	@JsonProperty
+	private JsonNode config;
 
-    public String getName() {
-	return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public SourceType getType() {
-	return type;
-    }
+	public SourceType getType() {
+		return type;
+	}
 
-    public JsonNode getConfig() {
-	return config;
-    }
+	public JsonNode getConfig() {
+		return config;
+	}
 
 }

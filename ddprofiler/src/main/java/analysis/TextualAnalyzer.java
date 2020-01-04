@@ -1,7 +1,7 @@
 /**
  * @author Raul - raulcf@csail.mit.edu
- *
  */
+
 package analysis;
 
 import java.util.ArrayList;
@@ -16,56 +16,59 @@ import analysis.modules.KMinHash;
 
 public class TextualAnalyzer implements TextualAnalysis {
 
-    private List<DataConsumer> analyzers;
-    private CardinalityAnalyzer ca;
-    private KMinHash mh;
-    private EntityAnalyzer ea;
+	private List<DataConsumer> analyzers;
 
-    private TextualAnalyzer(EntityAnalyzer ea, int pseudoRandomSeed) {
-	analyzers = new ArrayList<>();
-	mh = new KMinHash(pseudoRandomSeed);
-	ca = new CardinalityAnalyzer();
-	this.ea = ea;
-	analyzers.add(ca);
-	analyzers.add(mh);
-	analyzers.add(ea);
-    }
+	private CardinalityAnalyzer ca;
 
-    public static TextualAnalyzer makeAnalyzer(EntityAnalyzer ea2, int pseudoRandomSeed) {
-	ea2.clear();
-	return new TextualAnalyzer(ea2, pseudoRandomSeed);
-    }
+	private KMinHash mh;
 
-    @Override
-    public boolean feedTextData(List<String> records) {
-	Iterator<DataConsumer> dcs = analyzers.iterator();
-	while (dcs.hasNext()) {
-	    TextualDataConsumer dc = (TextualDataConsumer) dcs.next();
-	    dc.feedTextData(records);
+	private EntityAnalyzer ea;
+
+	private TextualAnalyzer(EntityAnalyzer ea, int pseudoRandomSeed) {
+		analyzers = new ArrayList<>();
+		mh = new KMinHash(pseudoRandomSeed);
+		ca = new CardinalityAnalyzer();
+		this.ea = ea;
+		analyzers.add(ca);
+		analyzers.add(mh);
+		analyzers.add(ea);
 	}
 
-	return false;
-    }
+	public static TextualAnalyzer makeAnalyzer(EntityAnalyzer ea2, int pseudoRandomSeed) {
+		ea2.clear();
+		return new TextualAnalyzer(ea2, pseudoRandomSeed);
+	}
 
-    @Override
-    public DataProfile getProfile() {
-	// TODO Auto-generated method stub
-	return null;
-    }
+	@Override
+	public boolean feedTextData(List<String> records) {
+		Iterator<DataConsumer> dcs = analyzers.iterator();
+		while (dcs.hasNext()) {
+			TextualDataConsumer dc = (TextualDataConsumer) dcs.next();
+			dc.feedTextData(records);
+		}
 
-    @Override
-    public Cardinality getCardinality() {
-	return ca.getCardinality();
-    }
+		return false;
+	}
 
-    @Override
-    public Entities getEntities() {
-	return ea.getEntities();
-    }
+	@Override
+	public DataProfile getProfile() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-    @Override
-    public long[] getMH() {
-	return mh.getMH();
-    }
+	@Override
+	public Cardinality getCardinality() {
+		return ca.getCardinality();
+	}
+
+	@Override
+	public Entities getEntities() {
+		return ea.getEntities();
+	}
+
+	@Override
+	public long[] getMH() {
+		return mh.getMH();
+	}
 
 }

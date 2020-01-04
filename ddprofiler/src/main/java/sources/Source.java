@@ -10,74 +10,49 @@ import sources.deprecated.Attribute;
 
 public interface Source {
 
-    /**
-     * Given a SourceConfig that configures access to a source, create necessary
-     * tasks and submit them to the Conductor for processing
-     * 
-     * @param config
-     * @param c
-     */
-    public List<Source> processSource(SourceConfig config);
+	/**
+	 * Given a SourceConfig that configures access to a source, create necessary tasks and submit them to the Conductor for processing
+	 */
+	public List<Source> processSource(SourceConfig config);
 
-    /**
-     * Return the source type
-     * 
-     * @return
-     */
-    public SourceType getSourceType();
+	/**
+	 * Return the source type
+	 */
+	public SourceType getSourceType();
 
-    /**
-     * Obtain a path to a specific source resource
-     * 
-     * @return
-     */
-    public String getPath();
+	/**
+	 * Obtain a path to a specific source resource
+	 */
+	public String getPath();
 
-    /**
-     * Obtain the name of the relation
-     * 
-     * @return
-     */
-    public String getRelationName();
+	/**
+	 * Obtain the name of the relation
+	 */
+	public String getRelationName();
 
-    /**
-     * Obtain the attributes for of the given source
-     * 
-     * @return
-     * @throws IOException
-     * @throws SQLException
-     */
-    public List<Attribute> getAttributes() throws IOException, SQLException;
+	/**
+	 * Obtain the attributes for of the given source
+	 */
+	public List<Attribute> getAttributes() throws IOException, SQLException;
 
-    /**
-     * Returns the original source config used to configure the current source
-     * 
-     * @return
-     */
-    public SourceConfig getSourceConfig();
+	/**
+	 * Returns the original source config used to configure the current source
+	 */
+	public SourceConfig getSourceConfig();
 
-    /**
-     * If this works as a task, returns the task ID FIXME: this does not belong
-     * here, need to find new iface
-     * 
-     * @return
-     */
-    public int getTaskId();
+	/**
+	 * If this works as a task, returns the task ID FIXME: this does not belong here, need to find new iface
+	 */
+	public int getTaskId();
 
-    /**
-     * Reads the actual source and returns the values along with each
-     * attribute's info
-     * 
-     * @param num
-     * @return
-     * @throws IOException
-     * @throws SQLException
-     */
-    public Map<Attribute, List<String>> readRows(int num) throws IOException, SQLException;
+	/**
+	 * Reads the actual source and returns the values along with each attribute's info
+	 */
+	public Map<Attribute, List<String>> readRows(int num) throws IOException, SQLException;
 
-    /**
-     * Cease existing. Free all resources consumed by this Source
-     */
-    public void close();
+	/**
+	 * Cease existing. Free all resources consumed by this Source
+	 */
+	public void close();
 
 }

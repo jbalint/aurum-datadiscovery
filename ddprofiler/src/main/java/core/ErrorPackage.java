@@ -2,9 +2,13 @@ package core;
 
 public class ErrorPackage {
 
-  private String errorLog;
+	private String errorLog;
 
-  public ErrorPackage(String log) { this.errorLog = log; }
+	public ErrorPackage(String log) {
+		this.errorLog = log;
+	}
 
-  public String getErrorLog() { return errorLog; }
+	public String getErrorLog() {
+		return errorLog;
+	}
 }

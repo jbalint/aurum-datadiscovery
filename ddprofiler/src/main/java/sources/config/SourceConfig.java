@@ -4,18 +4,18 @@ import sources.SourceType;
 
 public interface SourceConfig {
 
-    public SourceType getSourceType();
+	public SourceType getSourceType();
 
-    public String getSourceName();
+	public String getSourceName();
 
-    public void setSourceName(String sourceName);
+	public void setSourceName(String sourceName);
 
-    @Deprecated
-    public String getRelationName();
+	@Deprecated
+	public String getRelationName();
 
-    public String getPath();
+	public String getPath();
 
-    @Deprecated
-    public SourceConfig selfCopy();
+	@Deprecated
+	public SourceConfig selfCopy();
 
 }

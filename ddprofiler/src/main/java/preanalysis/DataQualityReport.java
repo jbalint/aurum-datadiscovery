@@ -1,3 +1,5 @@
 package preanalysis;
 
-public class DataQualityReport {}
+public class DataQualityReport {
+
+}
