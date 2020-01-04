@@ -155,7 +155,7 @@ def test_content_sim_num():
 
 if __name__ == "__main__":
 
-    #test_content_sim_num()
+    test_content_sim_num()
     #exit()
 
     path = None
