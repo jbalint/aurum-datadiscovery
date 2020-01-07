@@ -4,11 +4,14 @@
 
 package core.config;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import core.config.ConfigDef.Importance;
 import core.config.ConfigDef.Type;
+import store.StoreType;
 
 public class ProfilerConfig extends Config {
 
@@ -44,7 +47,8 @@ public class ProfilerConfig extends Config {
 	public static final String STORE_TYPE = "store.type";
 
 	private static final String STORE_TYPE_DOC = "Configures store type: "
-	                                             + "NULL(0), ELASTIC_HTTP(1), ELASTIC_NATIVE(2)";
+	                                             + StoreType.x
+		;
 
 	public static final String STORE_HTTP_PORT = "store.http.port";
 

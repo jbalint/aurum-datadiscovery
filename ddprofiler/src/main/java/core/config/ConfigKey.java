@@ -46,4 +46,9 @@ public class ConfigKey {
 	public boolean hasDefault() {
 		return this.defaultValue != NO_DEFAULT_VALUE;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("%s(%s)", getName(), this.defaultValue);
+	}
 }

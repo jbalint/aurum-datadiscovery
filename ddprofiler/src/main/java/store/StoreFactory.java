@@ -27,6 +27,13 @@ public class StoreFactory {
 		else if (type == StoreType.ELASTIC_NATIVE.ofType()) {
 			s = StoreFactory.makeNativeElasticStore(pc);
 		}
+		else if (type == StoreType.STARDOG.ofType()) {
+			s = new StardogStore();
+		}
+		else {
+			throw new IllegalArgumentException("Invalid store type: " + type);
+		}
 		return s;
 	}
+
 }

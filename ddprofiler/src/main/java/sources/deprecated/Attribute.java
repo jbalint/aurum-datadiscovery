@@ -5,7 +5,8 @@
 
 package sources.deprecated;
 
-@Deprecated
+// TODO : why is this deprecated
+//@Deprecated
 public class Attribute {
 
 	public enum AttributeType {

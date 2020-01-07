@@ -12,6 +12,9 @@ repositories {
     flatDir {
         dirs "drivers"
     }
+    maven {
+        url "http://maven.stardog.com"
+    }
 }
 
 dependencies {
@@ -62,6 +65,8 @@ dependencies {
     compile 'com.zaxxer:HikariCP:2.6.0'
 
     testCompile 'junit:junit:4.11'
+
+    compile ("com.complexible.stardog:client-http:7.0.3")
 }
 
 task fatJar(type: Jar) {

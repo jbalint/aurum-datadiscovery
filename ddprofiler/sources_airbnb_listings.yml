@@ -1,0 +1,7 @@
+api_version: 0
+sources:
+- name: "csv_repository"
+  type: csv
+  config:
+    path: "/home/jbalint/hdd/airbnb_datasets/Amsterdam_2019-12-07"
+    separator: ','

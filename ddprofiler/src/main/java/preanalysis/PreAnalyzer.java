@@ -70,6 +70,8 @@ public class PreAnalyzer implements PreAnalysis, IO {
 		// Calculate data types if not known yet
 		if (!knownDataTypes) {
 			calculateDataTypes(data);
+			// TODO : is it just a bug that this is never set?
+			knownDataTypes = true;
 		}
 
 		Map<Attribute, Values> castData = new HashMap<>();
@@ -97,9 +99,10 @@ public class PreAnalyzer implements PreAnalysis, IO {
 				List<Long> castValues = new ArrayList<>();
 				vs = Values.makeIntegerValues(castValues);
 				int successes = 0;
-				int errors = 0;
+				int errors = 0; // why don't we increment errors when the regex doesn't match
 				for (String s : e.getValue()) {
 					long f = 0;
+					// TODO : skipping the regex and allowing NumberFormatException should be faster
 					if (INT_PATTERN.matcher(s).matches()) {
 						try {
 							f = Long.valueOf(s).longValue();
@@ -252,6 +255,7 @@ public class PreAnalyzer implements PreAnalysis, IO {
 	}
 
 	private static boolean isBanned(String s) {
+		// TODO : this call is REALLY slow
 		String toCompare = s.trim().toLowerCase();
 		for (String ban : BANNED) {
 			if (toCompare.equals(ban)) {
