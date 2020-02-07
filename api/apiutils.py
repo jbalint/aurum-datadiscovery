@@ -290,6 +290,9 @@ class Provenance:
         return explanation
 
 
+"""
+Discovery results set
+"""
 class DRS:
 
     class RankingCriteria(Enum):
